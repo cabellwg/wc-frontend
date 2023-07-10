@@ -1,6 +1,7 @@
 /* Normalize */
 
-html, body {
+html,
+body {
     font-size: 16px;
     color: #333;
     background-color: #fefefe;
@@ -33,6 +34,7 @@ html, body {
 
 .text {
     padding: 0 2rem;
+    margin: 0 0 4rem 0;
 }
 
 .text__p:first-child {
@@ -70,19 +72,14 @@ html, body {
     text-decoration: inherit;
     font-weight: 800;
     width: 180px;
-    min-height: 44px;
+    min-height: 50px;
     padding: 0.5rem;
-    background-color: #eee;
+    border: #333 solid 1.5px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-
-/* Hover animations */
-
-.links__a:hover {
-    background-color: #bfcad6;
+    box-sizing: border-box;
+    border-radius: 2px;
 }
 
 
@@ -129,7 +126,7 @@ html, body {
     }
 
     .text {
-        margin: 2rem 0;
+        margin: 3rem 0;
     }
 
     .text__p {
