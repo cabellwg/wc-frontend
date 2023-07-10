@@ -1,3 +1,5 @@
+/* Normalize */
+
 html, body {
     font-size: 16px;
     color: #333;
@@ -6,4 +8,140 @@ html, body {
     border: 0;
     margin: 0;
     padding: 0;
+}
+
+
+/* Page setup */
+
+.home-container {
+    max-width: 800px;
+    min-height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.break {
+    padding: 2rem;
+    text-align: center;
+}
+
+
+/* Text */
+
+.text {
+    padding: 0 2rem;
+}
+
+.text__p:first-child {
+    margin-top: 0;
+}
+
+.text__p:last-child {
+    margin-bottom: 0;
+}
+
+.text__p--focus {
+    font-weight: 800;
+}
+
+
+/* Links */
+
+.links__list {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+    margin: 0;
+}
+
+.links__item {
+    margin: 1rem;
+}
+
+.links__item:first-child {
+    margin: 0 1rem 1rem;
+}
+
+.links__a {
+    color: inherit;
+    text-decoration: inherit;
+    font-weight: 800;
+    width: 180px;
+    min-height: 44px;
+    padding: 0.5rem;
+    background-color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Hover animations */
+
+.links__a:hover {
+    background-color: #bfcad6;
+}
+
+
+/* Footer for checksum */
+
+.footer {
+    position: absolute;
+    bottom: 1rem;
+}
+
+.footer__checksum {
+    font-size: 0.7rem;
+    font-style: italic;
+}
+
+
+/* Remove section breaks to avoid scrolling on small screens */
+
+@media (max-width: 600px) {
+    .home-container {
+        justify-content: flex-start;
+    }
+
+    .break {
+        display: none;
+    }
+
+    .text {
+        margin: 4rem 0;
+    }
+
+    .footer {
+        /* No one verifies a checksum on mobile or tablet */
+        display: none;
+    }
+}
+
+
+/* Fits on one iPhone 11 screen without scrolling */
+
+@media (max-width: 400px) {
+    .home-container {
+        font-size: 15px;
+    }
+
+    .text {
+        margin: 2rem 0;
+    }
+
+    .text__p {
+        margin: 12px 0;
+    }
+}
+
+
+/* Fits on Galaxy S20 screen without scrolling */
+
+@media (max-width: 360px) {
+    .home-container {
+        font-size: 14.5px;
+    }
 }
