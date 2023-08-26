@@ -30,11 +30,23 @@ body {
 }
 
 
+/* Headshot */
+
+.headshot {
+    padding: 0.5rem;
+    margin-top: 1rem;
+}
+
+.headshot__img {
+    width: 71px;
+}
+
+
 /* Text */
 
 .text {
     padding: 0 2rem;
-    margin: 0 0 4rem 0;
+    margin: 0;
 }
 
 .text__p:first-child {
@@ -96,19 +108,11 @@ body {
 }
 
 
-/* Remove section breaks to avoid scrolling on small screens */
+/* Adjustments for small screens */
 
 @media (max-width: 600px) {
     .home-container {
         justify-content: flex-start;
-    }
-
-    .break {
-        display: none;
-    }
-
-    .text {
-        margin: 4rem 0;
     }
 
     .footer {
@@ -118,27 +122,22 @@ body {
 }
 
 
-/* Fits on one iPhone 11 screen without scrolling */
+/* Adjustments for mobile */
 
-@media (max-width: 400px) {
-    .home-container {
-        font-size: 15px;
-    }
-
-    .text {
-        margin: 3rem 0;
+@media (max-aspect-ratio: 3/4) {
+    .headshot {
+        margin: 4rem 0 2rem;
     }
 
     .text__p {
         margin: 12px 0;
     }
-}
 
+    .break {
+        margin: 1.5rem 0;
+    }
 
-/* Fits on Galaxy S20 screen without scrolling */
-
-@media (max-width: 360px) {
-    .home-container {
-        font-size: 14.5px;
+    .links__list {
+        padding-bottom: 4rem;
     }
 }
