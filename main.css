@@ -3,8 +3,8 @@
 html,
 body {
     font-size: 15px;
-    color: #333;
-    background-color: #fefefe;
+    color: #2a2725;
+    background-color: #f7f4f0;
     font-family: Georgia, 'Times New Roman', Times, serif;
     border: 0;
     margin: 0;
@@ -18,10 +18,11 @@ body {
     max-width: 800px;
     min-height: 100vh;
     margin: 0 auto;
+    padding: 0 6rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: left;
 }
 
 .break {
@@ -29,24 +30,11 @@ body {
     text-align: center;
 }
 
-
-/* Headshot */
-
-.headshot {
-    padding: 0.5rem;
-    margin: 4rem 0 1.75rem;
-}
-
-.headshot__img {
-    width: 125px;
-}
-
-
 /* Text */
 
 .text {
     padding: 0 2rem;
-    margin: 0;
+    margin: 2rem 0 0;
     text-align: justify;
     -ms-hyphens: auto;
     -moz-hyphens: auto;
@@ -59,55 +47,31 @@ body {
 }
 
 .text__p:last-child {
-    margin-bottom: 0;
-}
-
-.text__p--focus {
-    font-weight: 800;
-}
-
-
-/* Links */
-
-.links__list {
-    list-style-type: none;
-    padding: 0;
-    text-align: center;
     margin: 0;
 }
 
-.links__item {
-    margin: 1rem;
-}
-
-.links__item:first-child {
-    margin: 0 1rem 1rem;
-}
-
-.links__a {
+.text__p--link {
     color: inherit;
-    text-decoration: inherit;
-    font-weight: 800;
-    width: 180px;
-    min-height: 50px;
-    padding: 0.5rem;
-    border: #333 solid 1.5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    border-radius: 2px;
+}
+
+.signature {
+    margin: 2rem 0 0.5rem;
+    height: 3rem;
 }
 
 
 /* Footer for checksum */
 
 .footer {
-    margin: 1rem;
+    margin: 0rem 2rem;
+    padding: 0 0 2rem;
+    text-align: left;
+    
 }
 
 .footer__checksum {
     font-size: 0.7rem;
+    color: #b8b0ac;
     font-style: italic;
 }
 
@@ -117,6 +81,7 @@ body {
 @media (max-width: 600px) {
     .home-container {
         justify-content: flex-start;
+        padding: 0;
     }
 
     .text {
@@ -127,26 +92,5 @@ body {
     .footer {
         /* No one verifies a checksum on mobile or tablet */
         display: none;
-    }
-}
-
-
-/* Adjustments for mobile */
-
-@media (max-aspect-ratio: 3/4) {
-    .headshot {
-        margin: 4rem 0 2rem;
-    }
-
-    .text__p {
-        margin: 12px 0;
-    }
-
-    .break {
-        margin: 1.5rem 0;
-    }
-
-    .links__list {
-        padding-bottom: 4rem;
     }
 }
