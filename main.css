@@ -9,6 +9,7 @@ body {
     border: 0;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 
 
@@ -20,7 +21,10 @@ body {
     margin: 0;
     padding: 0;
     position: absolute;
-    z-index: 1;
+}
+
+#mobile-scrollwork {
+    display: none;
 }
 
 .home-container {
@@ -32,7 +36,16 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: left;
-    z-index: 2;
+}
+
+.home-container * {
+    /*
+      TODO:
+      Setting this on the home container directly breaks the frame calculations.
+      Frame calculations should not depend on this, if possible.
+    */
+    position: relative;
+    z-index: 1;
 }
 
 .break {
@@ -91,7 +104,7 @@ body {
 @media (max-width: 600px) {
     .home-container {
         justify-content: flex-start;
-        padding: 0;
+        padding: 75px 0 0;
     }
 
     .text {
@@ -102,5 +115,18 @@ body {
     .footer {
         /* No one verifies a checksum on mobile or tablet */
         display: none;
+    }
+
+    #scrollwork {
+        display: none;
+    }
+
+    #mobile-scrollwork {
+        display: block;
+        width: 100vw;
+        height: 100px;
+        margin: 0;
+        padding: 0;
+        position: absolute;
     }
 }

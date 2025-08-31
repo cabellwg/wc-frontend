@@ -97,18 +97,31 @@ function drawInnerFrame(ctx) {
 }
 
 
-function drawOuterFrame(ctx, inset = 30) {
-    if (!typeof ctx === CanvasRenderingContext2D) {
-        throw new TypeError(`CanvasRenderingContext2D required, received ${typeof ctx}`);
-    }
-
-    
-    const outerFrameDim = {
+function getOuterFrameBounds(inset = 30) {
+    return {
         x: inset,
         y: inset,
         w: RES * document.documentElement.clientWidth - 2 * inset,
         h: RES * document.documentElement.scrollHeight - 2 * inset
     };
+}
+
+
+function getMobileFrameBounds(height = 100, inset = 100) {
+    return {
+        x: inset,
+        y: inset,
+        w: RES * document.documentElement.clientWidth - 2 * inset,
+        h: RES * height - 2 * inset
+    };
+}
+
+
+function drawOuterFrame(ctx, outerFrameDim) {
+    if (!typeof ctx === CanvasRenderingContext2D) {
+        throw new TypeError(`CanvasRenderingContext2D required, received ${typeof ctx}`);
+    }
+    
 
     const frames = [
         {
@@ -134,7 +147,7 @@ function drawOuterFrame(ctx, inset = 30) {
 }
 
 
-function drawSpiralByBox(ctx, boundingBox, vorticity, orientation) {
+function drawSpiralByBox(ctx, boundingBox, vorticity, orientation, resolution = 10) {
     ctx.strokeStyle = STROKE_COLOR;
 
     const b = vorticity;
@@ -162,11 +175,11 @@ function drawSpiralByBox(ctx, boundingBox, vorticity, orientation) {
         }
     }    
 
-    const max_t = Math.ceil((360 / (2 * Math.PI)) * tx);
+    const max_t = Math.ceil((360 / (2 * Math.PI)) * tx) + (resolution / 2);
 
     ctx.moveTo(delta.x, delta.y);
     ctx.beginPath();
-    for (t = 0; t < max_t + 1; t++) {
+    for (t = 0; t < max_t + 1; t += resolution) {
         angle = (2 * Math.PI * t) / 360;
         const pt = logSpiralTransformed(angle);
         ctx.lineTo(pt.x, pt.y);
@@ -178,14 +191,12 @@ function drawSpiralByBox(ctx, boundingBox, vorticity, orientation) {
 }
 
 
-function drawSpiralByCenter(ctx, center, maxX, maxY, orientation) {
+function drawSpiralByCenter(ctx, center, maxX, maxY, orientation, resolution = 10) {
     ctx.strokeStyle = STROKE_COLOR;
 
     const b = maxY / maxX;
     const tx = 4 * Math.PI + Math.atan(b);
     const a = Math.sqrt(maxX ** 2 + maxY ** 2) / Math.exp(b * tx);
-
-    console.log(orientation, a, b, tx)
 
     const logSpiral = t => {
         x = (a * Math.exp(b * t) * Math.cos(t));
@@ -201,11 +212,11 @@ function drawSpiralByCenter(ctx, center, maxX, maxY, orientation) {
         }
     }    
 
-    const max_t = Math.ceil((360 / (2 * Math.PI)) * tx);
+    const max_t = Math.ceil((360 / (2 * Math.PI)) * tx) + (resolution / 2);
 
     ctx.moveTo(center.x, center.y);
     ctx.beginPath();
-    for (t = 0; t < max_t + 1; t++) {
+    for (t = 0; t < max_t + 1; t += resolution) {
         angle = (2 * Math.PI * t) / 360;
         const pt = logSpiralTransformed(angle);
         ctx.lineTo(pt.x, pt.y);
@@ -243,7 +254,7 @@ function drawLeaf(ctx, boundingBox, vorticity, stemWidth, orientation) {
 
 function drawScroll(ctx, boundingBox) {
     const stemWidth = 0.1 * boundingBox.w;
-    const asymmetry = 0.65; // must be greater than or equal to 0.5
+    const asymmetry = 0.65 + 0.02 * Math.random(); // must be greater than or equal to 0.5
 
     // ctx.strokeRect(
     //     boundingBox.x,
@@ -270,31 +281,34 @@ function drawScroll(ctx, boundingBox) {
 
 
 function tile(ctx, outerBorder, innerBorder, n, aspectRatio = 1) {
-    let tileW = outerBorder.w / n;
-    const [nx, ny] = [n, Math.floor(outerBorder.h / (tileW * aspectRatio))];
-    let tileH = outerBorder.h / ny;
+    let tileW = innerBorder.w / n;
+    let tileH = innerBorder.h / Math.floor(innerBorder.h / (tileW * aspectRatio));
+    const [nx, ny] = [Math.floor(outerBorder.w / tileW) - 1, Math.floor(outerBorder.h / tileH) - 1];
     
-    if (tileW % innerBorder.w > 0.01 || tileH % innerBorder.h > 0.01) {
-        console.warn("Imperfect tiling. Gaps may be visible.")
-    }
+    const tilingBounds = {
+        x: innerBorder.x - Math.floor((innerBorder.x - outerBorder.x) / tileW) * tileW,
+        y: innerBorder.y - Math.floor((innerBorder.y - outerBorder.y) / tileH) * tileH,
+        w: tileW * nx,
+        h: tileH * ny
+    };
 
-    ctx.lineWidth = 0.75 * RES;
+    ctx.lineWidth = 0.5 * RES;
     ctx.strokeStyle = STROKE_COLOR;
 
     for (let i = 0; i < nx; i++) {
         for (let j = 0; j < ny; j++) {
             const tileDim = {
-                x: outerBorder.x + i * tileW,
-                y: outerBorder.x + j * tileH,
+                x: tilingBounds.x + i * tileW,
+                y: tilingBounds.y + j * tileH,
                 w: tileW,
                 h: tileH
             }
 
             if (
-                ((innerBorder.x <= tileDim.x && tileDim.x < innerBorder.x + innerBorder.w)
-                || (innerBorder.x < tileDim.x + tileDim.w && tileDim.x + tileDim.w < innerBorder.x + innerBorder.w))
-                && ((innerBorder.y <= tileDim.y && tileDim.y < innerBorder.y + innerBorder.h)
-                || (innerBorder.y < tileDim.y + tileDim.h && tileDim.y + tileDim.h < innerBorder.y + innerBorder.h))
+                (((innerBorder.x <= tileDim.x - 0.5 && tileDim.x < innerBorder.x + innerBorder.w - 0.5)
+                || (innerBorder.x < tileDim.x + tileDim.w - 0.5 && tileDim.x + tileDim.w < innerBorder.x + innerBorder.w - 0.5))
+                && ((innerBorder.y <= tileDim.y - 0.5 && tileDim.y < innerBorder.y + innerBorder.h - 0.5)
+                || (innerBorder.y < tileDim.y + tileDim.h - 0.5 && tileDim.y + tileDim.h < innerBorder.y + innerBorder.h - 0.5)))
             ) {
                 continue;
             }
@@ -303,13 +317,56 @@ function tile(ctx, outerBorder, innerBorder, n, aspectRatio = 1) {
             ctx.translate(tileDim.x + tileW * 0.5, tileDim.y + tileH * 0.5);
             ctx.rotate(((i + j) % 2) * Math.PI)
             drawScroll(ctx, {
-                x: -tileW * 0.5,
-                y: -tileH * 0.5,
-                w: tileDim.w,
-                h: tileDim.h
+                x: -tileW * 0.5 + (1.01 * Math.random() - 0.505),
+                y: -tileH * 0.5 + (1.01 * Math.random() - 0.505),
+                w: tileDim.w + (1.01 * Math.random() - 0.505),
+                h: tileDim.h + (1.01 * Math.random() - 0.505)
             });
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
         }
     }
+
+    return tilingBounds;
+}
+
+function simpleTile(ctx, outerBorder, n, aspectRatio = 1) {
+    let tileW = outerBorder.w / n;
+    let tileH = outerBorder.h / Math.floor(outerBorder.h / (tileW * aspectRatio));
+    const [nx, ny] = [Math.floor(outerBorder.w / tileW), Math.floor(outerBorder.h / tileH)];
+    
+    const tilingBounds = {
+        x: outerBorder.x,
+        y: outerBorder.y,
+        w: tileW * nx,
+        h: tileH * ny
+    };
+
+    ctx.lineWidth = 0.5 * RES;
+    ctx.strokeStyle = STROKE_COLOR;
+
+    for (let i = 0; i < nx; i++) {
+        for (let j = 0; j < ny; j++) {
+            const tileDim = {
+                x: tilingBounds.x + i * tileW,
+                y: tilingBounds.y + j * tileH,
+                w: tileW,
+                h: tileH
+            }
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.translate(tileDim.x + tileW * 0.5, tileDim.y + tileH * 0.5);
+            ctx.rotate(((i + j) % 2) * Math.PI)
+            drawScroll(ctx, {
+                x: -tileW * 0.5 + (1.01 * Math.random() - 0.505),
+                y: -tileH * 0.5 + (1.01 * Math.random() - 0.505),
+                w: tileDim.w + (1.01 * Math.random() - 0.505),
+                h: tileDim.h + (1.01 * Math.random() - 0.505)
+            });
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+    }
+
+    return tilingBounds;
 }
 
 
@@ -322,16 +379,46 @@ function drawScrolls() {
         const ctx = canvas.getContext("2d");
 
         const innerFrameDim = drawInnerFrame(ctx);
-        const outerFrameDim = drawOuterFrame(ctx);
+        const outerBounds = getOuterFrameBounds();
 
-        const innerFrameBounds = {
+        const innerBounds = {
             x: innerFrameDim.x - innerFrameDim.frameWidth,
             y: innerFrameDim.y - innerFrameDim.frameWidth,
             w: innerFrameDim.w + 2 * innerFrameDim.frameWidth,
             h: innerFrameDim.h + 2 * innerFrameDim.frameWidth
         }
-        tile(ctx, outerFrameDim, innerFrameBounds, 78);
+        const tilingBounds = tile(ctx, outerBounds, innerBounds, 50);
+        drawOuterFrame(ctx, tilingBounds);
     }
 }
 
-window.onload = drawScrolls;
+function drawMobileScrolls() {
+    const canvas = document.getElementById("mobile-scrollwork");
+    canvas.width = RES * canvas.offsetWidth;
+    canvas.height = RES * canvas.offsetHeight;
+
+    if (canvas.getContext) {
+        const ctx = canvas.getContext("2d");
+
+        const outerBounds = getMobileFrameBounds();
+        const tilingBounds = simpleTile(ctx, outerBounds, 22);
+        drawOuterFrame(ctx, tilingBounds);
+    }
+}
+
+function drawAllScrolls() {
+    drawScrolls();
+    drawMobileScrolls();
+}
+
+
+window.onload = drawAllScrolls;
+
+// Debounced redraw on resize
+let timeout = false;
+const delay = 100;
+
+window.addEventListener('resize', function() {
+  clearTimeout(timeout);
+  timeout = setTimeout(drawAllScrolls, delay);
+});
